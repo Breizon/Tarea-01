@@ -130,8 +130,8 @@ exports.deleteRepair = async (req, res) => {
     await repair.update({ status: 'cancelled' });
 
     res.status(200).json({
-      status: 'cancelled',
-      message: 'The repair has been cancelled successfully',
+      status: 'success',
+      message: 'The repair has been deleted successfully',
     });
   } catch (error) {
     return res.status(500).json({
