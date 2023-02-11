@@ -8,7 +8,7 @@ const User = db.define('client', {
     allowNull: false,
     type: DataTypes.INTEGER,
   },
-  username: {
+  name: {
     type: DataTypes.STRING,
     allowNull: false,
   },
