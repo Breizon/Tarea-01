@@ -1,144 +1,66 @@
 const User = require('../models/user.model');
+const catchAsync = require('../utils/catchAsync');
 
-exports.findAllUsers = async (req, res) => {
-  try {
-    const users = await User.findAll({
-      where: {
-        status: 'available',
-      },
-    });
+exports.findAllUsers = catchAsync(async (req, res, next) => {
+  const users = await User.findAll({
+    where: {
+      status: 'available',
+    },
+  });
 
-    res.status(200).json({
-      status: 'success',
-      message: 'The users were found successfully',
-      users,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      status: 'error',
-      message: 'Internal server error',
-    });
-  }
-};
+  res.status(200).json({
+    status: 'success',
+    message: 'The users were found successfully',
+    users,
+  });
+});
 
-exports.findUserById = async (req, res) => {
-  try {
-    const { id } = req.params;
+exports.findUserById = catchAsync(async (req, res, next) => {
+  const { user } = req;
 
-    const user = await User.findOne({
-      where: {
-        id,
-        status: 'available',
-      },
-    });
+  res.status(200).json({
+    status: 'success',
+    message: 'The user found was successfully',
+    user,
+  });
+});
 
-    if (!user) {
-      return res.status(404).json({
-        status: 'error',
-        message: 'The user was not found',
-      });
-    }
+exports.createNewUser = catchAsync(async (req, res, next) => {
+  const { username, email, password, role } = req.body;
 
-    res.status(200).json({
-      status: 'success',
-      message: 'The user found was successfully',
-      user,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      status: 'error',
-      message: 'Internal server error',
-    });
-  }
-};
+  const newUser = await User.create({
+    username: username,
+    email: email,
+    password,
+    role,
+  });
 
-exports.createNewUser = async (req, res) => {
-  try {
-    const { username, email, password, role } = req.body;
+  res.status(201).json({
+    status: 'success',
+    message: 'The user was created successfully',
+    newUser,
+  });
+});
 
-    const newUser = await User.create({
-      username: username,
-      email: email,
-      password,
-      role,
-    });
+exports.updateUser = catchAsync(async (req, res, next) => {
+  const { user } = req;
+  const { username, email } = req.body;
 
-    res.status(201).json({
-      status: 'success',
-      message: 'The user was created successfully',
-      newUser,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      status: 'error',
-      message: 'Internal server error',
-    });
-  }
-};
+  await user.update({ username, email });
 
-exports.updateUser = async (req, res) => {
-  try {
-    const { id } = req.params;
+  res.json({
+    status: 'success',
+    message: 'The user has been updated succesfully',
+  });
+});
 
-    const { username, email } = req.body;
+exports.deleteUser = catchAsync(async (req, res) => {
+  const { user } = req;
 
-    const user = await User.findOne({
-      where: {
-        id,
-        status: 'available',
-      },
-    });
+  await user.update({ status: 'disabled' });
 
-    if (!user) {
-      return res.status(404).json({
-        status: 'error',
-        message: 'The user was not found',
-      });
-    }
-
-    const updatedUser = await user.update({ username, email });
-
-    res.json({
-      status: 'success',
-      message: 'The user has been updated succesfully',
-      updatedUser,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      status: 'error',
-      message: 'Internal server error',
-    });
-  }
-};
-
-exports.deleteUser = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const user = await User.findOne({
-      where: {
-        id,
-        status: 'available',
-      },
-    });
-
-    if (!user) {
-      return res.status(404).json({
-        status: 'error',
-        message: 'The user was not found',
-      });
-    }
-
-    await user.update({ status: 'disabled' });
-
-    res.status(200).json({
-      status: 'success',
-      message: 'The user has been deleted successfully',
-    });
-  } catch (error) {
-    return res.status(500).json({
-      status: 'error',
-      message: 'Internal server error',
-    });
-  }
-};
+  res.status(200).json({
+    status: 'success',
+    message: 'The user has been deleted successfully',
+  });
+});
