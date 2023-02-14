@@ -1,11 +1,18 @@
+const Repair = require('../models/repair.model');
 const User = require('../models/user.model');
 const catchAsync = require('../utils/catchAsync');
 
 exports.findAllUsers = catchAsync(async (req, res, next) => {
   const users = await User.findAll({
+    attributes: ['id', 'name', 'email', 'status'],
     where: {
       status: 'available',
     },
+    include: [
+      {
+        model: Repair,
+      },
+    ],
   });
 
   res.status(200).json({
