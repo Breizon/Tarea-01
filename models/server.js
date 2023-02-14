@@ -1,8 +1,16 @@
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
+const hpp = require('hpp');
+const morgan = require('morgan');
+const xss = require('xss-clean');
+
 const { db } = require('../database/db');
 const { usersRouter } = require('../routes/users.routes');
 const { repairsRouter } = require('../routes/repairs.routes');
+const AppError = require('../utils/appError');
+const globalErrorHandle = require('../controllers/error.controller');
+const initModel = require('./initModels');
 
 class Server {
   constructor() {
@@ -22,6 +30,13 @@ class Server {
   }
 
   middlewares() {
+    this.app.use(helmet());
+    this.app.use(xss());
+    this.app.use(hpp());
+
+    if (process.env.NODE_ENV === 'development') {
+      this.app.use(morgan('dev'));
+    }
     this.app.use(cors());
     this.app.use(express.json());
   }
@@ -29,12 +44,23 @@ class Server {
   routes() {
     this.app.use(this.paths.users, usersRouter);
     this.app.use(this.paths.repairs, repairsRouter);
+
+    this.app.all('*', (req, res, next) => {
+      return next(
+        new AppError(`Can't find ${req.originalUrl} on this server!`, 404)
+      );
+    });
+
+    this.app.use(globalErrorHandle);
   }
 
   database() {
     db.authenticate()
       .then(() => console.log('Database authenticate'))
       .catch(err => console.log(err));
+
+    //relaciones
+    initModel();
 
     db.sync()
       .then(() => console.log('Database synced'))
