@@ -8,11 +8,6 @@ exports.findAllUsers = catchAsync(async (req, res, next) => {
     where: {
       status: 'available',
     },
-    include: [
-      {
-        model: Repair,
-      },
-    ],
   });
 
   res.status(200).json({
@@ -29,23 +24,6 @@ exports.findUserById = catchAsync(async (req, res, next) => {
     status: 'success',
     message: 'The user found was successfully',
     user,
-  });
-});
-
-exports.createNewUser = catchAsync(async (req, res, next) => {
-  const { username, email, password, role } = req.body;
-
-  const newUser = await User.create({
-    username: username,
-    email: email,
-    password,
-    role,
-  });
-
-  res.status(201).json({
-    status: 'success',
-    message: 'The user was created successfully',
-    newUser,
   });
 });
 

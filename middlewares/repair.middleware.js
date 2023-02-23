@@ -8,8 +8,13 @@ exports.validIfExistRepair = catchAsync(async (req, res, next) => {
   const repair = await Repair.findOne({
     where: {
       id,
-      status: 'pending',
+      status: ['pending', 'completed'],
     },
+    include: [
+      {
+        model: User,
+      },
+    ],
   });
 
   if (!repair) {

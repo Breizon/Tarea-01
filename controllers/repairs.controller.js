@@ -5,7 +5,7 @@ const catchAsync = require('../utils/catchAsync');
 exports.findAllRepairs = catchAsync(async (req, res, next) => {
   const repairs = await Repair.findAll({
     where: {
-      status: 'pending',
+      status: ['pending', 'completed'],
     },
     include: [
       {

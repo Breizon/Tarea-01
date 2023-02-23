@@ -25,6 +25,10 @@ const User = db.define('client', {
     allowNull: false,
     defaultValue: 'client',
   },
+  passwordChangedAt: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
   status: {
     type: DataTypes.STRING,
     allowNull: false,

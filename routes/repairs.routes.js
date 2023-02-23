@@ -7,14 +7,17 @@ const {
   updateRepair,
   deleteRepair,
 } = require('../controllers/repairs.controller');
+const { protectToken, restrictTo } = require('../middlewares/auth.middleware');
 const { validIfExistRepair } = require('../middlewares/repair.middleware');
 const { validateFields } = require('../middlewares/validateField.middleware');
 
 const router = Router();
 
-router.get('', findAllRepairs);
+router.use(protectToken);
 
-router.get('/:id', validIfExistRepair, findRepairById);
+router.get('', restrictTo('employee'), findAllRepairs);
+
+router.get('/:id', validIfExistRepair, restrictTo('employee'), findRepairById);
 
 router.post(
   '',
@@ -24,6 +27,7 @@ router.post(
     check('motorsNumber', 'The motorsNumber must be mandatory').not().isEmpty(),
     check('description', 'The description must be mandatory').not().isEmpty(),
     validateFields,
+    restrictTo('employee'),
   ],
   createNewRepair
 );
@@ -37,11 +41,12 @@ router.patch(
     check('description', 'The description must be mandatory').not().isEmpty(),
     validateFields,
     validIfExistRepair,
+    restrictTo('employee'),
   ],
   updateRepair
 );
 
-router.delete('/:id', validIfExistRepair, deleteRepair);
+router.delete('/:id', validIfExistRepair, restrictTo('employee'), deleteRepair);
 
 module.exports = {
   repairsRouter: router,
